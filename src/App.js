@@ -7,11 +7,12 @@ function App() {
   const [airBnBLink, setAirBnBLink] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [results, setResults] = useState(null);
+  const [result, setResult] = useState(null);
   const [fetchedData, setFetchedData] = useState([]);
   const [parseURL, setParseURL] = useState("");
 
   const submit = () => {
+    setResult(null);
     if (airBnBLink === "") {
       setError("Please enter an Airbnb Link");
       setAirBnBLink("");
@@ -20,16 +21,18 @@ function App() {
       setAirBnBLink("");
     } else {
       let newURL = airBnBLink.split("rooms/").pop().split("?")[0];
+      newURL = newURL.replace(/ /g, "");
       setParseURL(newURL);
       setAirBnBLink("");
-      checkIfAirbnbListingExists(parseURL);
+      checkIfAirbnbListingExists(newURL);
     }
   };
 
-  const checkIfAirbnbListingExists = (URL) => {
+  const checkIfAirbnbListingExists = (parsedURL) => {
     fetchedData.map((listing) => {
-      if (listing.url === URL) {
-        setResults(listing);
+      // console.log("listing", listing.url.length, "url", parsedURL.toString());
+      if (listing.url.toString() === parsedURL.toString()) {
+        setResult(listing);
       } else {
         setError("No Results Found");
       }
@@ -43,7 +46,7 @@ function App() {
       if (data !== null) {
         setFetchedData(
           data.docs.map((doc) => {
-            console.log(doc.data());
+            return doc.data();
           })
         );
       }
@@ -65,15 +68,11 @@ function App() {
         airBnBLink={airBnBLink}
       />
 
-      {results && (
-        <div className="results__container">
-          {results.map((item, i) => {
-            return (
-              <div>
-                <p>{item}</p>
-              </div>
-            );
-          })}
+      {result && (
+        <div className="result__container">
+          <div>
+            <p>{result.title}</p>
+          </div>
         </div>
       )}
     </div>

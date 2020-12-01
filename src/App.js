@@ -2,12 +2,13 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import firebase from "./firebase";
 import UserInput from "./components/UserInput/UserInput";
+import CreateListing from "./components/CreateListing/CreateListing";
 
 function App() {
   const [airBnBLink, setAirBnBLink] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState("");
   const [fetchedData, setFetchedData] = useState([]);
   const [parseURL, setParseURL] = useState("");
 
@@ -23,18 +24,19 @@ function App() {
       let newURL = airBnBLink.split("rooms/").pop().split("?")[0];
       newURL = newURL.replace(/ /g, "");
       setParseURL(newURL);
-      setAirBnBLink("");
       checkIfAirbnbListingExists(newURL);
     }
   };
 
   const checkIfAirbnbListingExists = (parsedURL) => {
     fetchedData.map((listing) => {
-      // console.log("listing", listing.url.length, "url", parsedURL.toString());
       if (listing.url.toString() === parsedURL.toString()) {
         setResult(listing);
+        setAirBnBLink("");
       } else {
         setError("No Results Found");
+        console.log("bnbnbbn", airBnBLink);
+        setResult(null);
       }
     });
   };
@@ -62,11 +64,20 @@ function App() {
           <p>{error}</p>
         </div>
       )}
-      <UserInput
-        submit={submit}
-        setAirBnBLink={setAirBnBLink}
-        airBnBLink={airBnBLink}
-      />
+
+      {result != null ? (
+        <UserInput
+          submit={submit}
+          setAirBnBLink={setAirBnBLink}
+          airBnBLink={airBnBLink}
+        />
+      ) : (
+        <CreateListing
+          setAirBnBLink={setAirBnBLink}
+          airBnBLink={airBnBLink}
+          parseURL={parseURL}
+        />
+      )}
 
       {result && (
         <div className="result__container">

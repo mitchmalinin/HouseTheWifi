@@ -10,9 +10,23 @@ function App() {
   const [error, setError] = useState(null);
   const [result, setResult] = useState("");
   const [fetchedData, setFetchedData] = useState([]);
+  const [listingData, setListingData] = useState(null);
   const [parseURL, setParseURL] = useState("");
 
-  const submit = () => {
+  const getReferenceURL = async () => {
+    console.log("airbnb", airBnBLink);
+    const res = await fetch("http://localhost:8080/get-listing-info", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ link: airBnBLink }),
+    });
+    let data = await res.json();
+    return data;
+  };
+
+  const submit = async () => {
     setResult(null);
     if (airBnBLink === "") {
       setError("Please enter an Airbnb Link");
@@ -21,9 +35,9 @@ function App() {
       setError("Please enter a Valid Airbnb Link");
       setAirBnBLink("");
     } else {
-      let newURL = airBnBLink.split("rooms/").pop().split("?")[0];
-      newURL = newURL.replace(/ /g, "");
-      setParseURL(newURL);
+      let data = await getReferenceURL(airBnBLink);
+      setListingData(data);
+      let newURL = data[2].split("rooms/")[1];
       checkIfAirbnbListingExists(newURL);
     }
   };
